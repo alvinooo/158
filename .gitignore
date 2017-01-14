@@ -1,0 +1,8 @@
+*.py[cod]
+*.png
+*.pdf
+*.pem
+*.txt
+*.txt.bak
+*.csv
+*.json
