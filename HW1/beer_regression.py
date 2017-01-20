@@ -6,14 +6,7 @@ import random
 def parseData(fname):
 	for l in urllib.urlopen(fname):
 		yield eval(l)
-
-# def parseData(fname):
-# 	with open(fname) as f:
-# 		for _ in xrange(50000):
-# 			yield eval(next(f))
-
 data = list(parseData("http://jmcauley.ucsd.edu/cse190/data/beer/beer_50000.json"))
-# data = list(parseData("beer_50000.json"))
 
 # 1
 def average(data):
@@ -35,20 +28,22 @@ print "counts", counts
 print "average", avg
 
 # 2
-x = np.matrix([[1, review['review/timeStruct']['year']] for review in data])
-y = np.matrix([review['review/overall'] for review in data])
+x = np.array([[1, review['review/timeStruct']['year']] for review in data])
+y = np.array([review['review/overall'] for review in data])
 theta, residuals, rank, s = np.linalg.lstsq(x, y.T)
-print "MSE", residuals / len(data)
+print "Original MSE", residuals / len(data)
 
-def feature(review, count):
-    matrix = [1]
-    for degree in xrange(count):
-        matrix.append(review['review/timeStruct']['year'] ** (degree + 1))
-    return matrix
+# 3 b
+def feature(review):
+    array = [1]
+    year = review['review/timeStruct']['year']
+    period = 20
+    for i in xrange(period):
+        array.append(1 if year % period == i else 0)
+    return array
 
-# 3
-x = np.matrix([[1] + feature(review, 10) for review in data])
-y = np.matrix([review['review/overall'] for review in data])
+x = np.array([feature(review) for review in data])
+y = np.array([review['review/overall'] for review in data])
 theta, residuals, rank, s = np.linalg.lstsq(x, y.T)
 diff = np.dot(x, theta) - y.T
-print "MSE", np.dot(diff.T,diff) / len(data)
+print "Improved MSE", np.dot(diff.T,diff) / len(data)
