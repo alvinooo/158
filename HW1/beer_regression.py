@@ -1,7 +1,6 @@
 import numpy as np
 import urllib
 import scipy.optimize
-import random
 
 def parseData(fname):
 	for l in urllib.urlopen(fname):
@@ -31,6 +30,7 @@ print "average", avg
 x = np.array([[1, review['review/timeStruct']['year']] for review in data])
 y = np.array([review['review/overall'] for review in data])
 theta, residuals, rank, s = np.linalg.lstsq(x, y.T)
+print "Theta", theta
 print "Original MSE", residuals / len(data)
 
 # 3 b
