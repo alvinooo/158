@@ -190,9 +190,18 @@ print pca.components_
 print numpy.dot(X_train[0], pca.components_.T)
 
 # 8
+# Explicitly compress and uncompress the data
 pca = PCA(n_components=4)
 pca.fit(X_train)
 compressed = numpy.dot(X_train, pca.components_.T)
 uncompressed = numpy.dot(compressed, pca.components_)
 diff = numpy.array(X_train) - uncompressed
 print sum([numpy.dot(d, d) for d in diff])
+
+# Using the definition of reconstruction error
+mean = numpy.tile(numpy.mean(X_train, axis=0), (len(X_train), 1))
+diff = numpy.array(X_train) - mean
+pca = PCA()
+pca.fit(X_train)
+diff_transform = numpy.dot(X_train, pca.components_[4:].T)
+print sum([numpy.dot(d, d) for d in diff_transform])
