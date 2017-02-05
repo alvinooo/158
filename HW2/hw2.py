@@ -16,8 +16,6 @@ featureNames = fields[:-1]
 labelName = fields[-1]
 lines = [[1.0] + [float(x) for x in l.split(';')] for l in dataFile]
 
-# 2
-random.shuffle(lines)
 X = [l[:-1] for l in lines]
 y = [l[-1] > 5 for l in lines]
 print "done"
@@ -66,6 +64,7 @@ y_validate = y[int(len(y)/3):int(2*len(y)/3)]
 X_test = X[int(2*len(X)/3):]
 y_test = y[int(2*len(X)/3):]
 
+
 ##################################################
 # Train                                          #
 ##################################################
@@ -106,10 +105,38 @@ for lam in [0, 0.01, 1.0, 100.0]:
   acc_train, acc_validate, acc_test = performance(theta)
   print("lambda = " + str(lam) + ";\ttrain=" + str(acc_train) + "; validate=" + str(acc_validate) + "; test=" + str(acc_test))
 
+# 2
+shuffled = lines[:]
+random.shuffle(shuffled)
+
+X = [l[:-1] for l in shuffled]
+y = [l[-1] > 5 for l in shuffled]
+
+X_train = X[:int(len(X)/3)]
+y_train = y[:int(len(y)/3)]
+X_validate = X[int(len(X)/3):int(2*len(X)/3)]
+y_validate = y[int(len(y)/3):int(2*len(y)/3)]
+X_test = X[int(2*len(X)/3):]
+y_test = y[int(2*len(X)/3):]
+
+for lam in [0, 0.01, 1.0, 100.0]:
+  theta = train(lam)
+  acc_train, acc_validate, acc_test = performance(theta)
+  print("lambda = " + str(lam) + ";\ttrain=" + str(acc_train) + "; validate=" + str(acc_validate) + "; test=" + str(acc_test))
+
+X = [l[:-1] for l in lines]
+y = [l[-1] > 5 for l in lines]
+
+X_train = X[:int(len(X)/3)]
+y_train = y[:int(len(y)/3)]
+X_validate = X[int(len(X)/3):int(2*len(X)/3)]
+y_validate = y[int(len(y)/3):int(2*len(y)/3)]
+X_test = X[int(2*len(X)/3):]
+y_test = y[int(2*len(X)/3):]
+
+# 3
 lam = 0.01
 theta = train(lam)
-acc_train, acc_validate, acc_test = performance(theta)
-print("lambda = " + str(lam) + ";\ttrain=" + str(acc_train) + "; validate=" + str(acc_validate) + "; test=" + str(acc_test))
 
 # 3
 def ber(theta):
@@ -157,14 +184,15 @@ print sum([numpy.dot(d, d) for d in diff])
 # 6
 pca = PCA()
 pca.fit(X_train)
+print pca.components_
 
 # 7
-print pca.transform(numpy.array(X_train[0]).reshape(1, -1))
+print numpy.dot(X_train[0], pca.components_.T)
 
 # 8
 pca = PCA(n_components=4)
 pca.fit(X_train)
-compressed = pca.transform(X_train)
-uncompressed = pca.inverse_transform(compressed)
+compressed = numpy.dot(X_train, pca.components_.T)
+uncompressed = numpy.dot(compressed, pca.components_)
 diff = numpy.array(X_train) - uncompressed
 print sum([numpy.dot(d, d) for d in diff])
